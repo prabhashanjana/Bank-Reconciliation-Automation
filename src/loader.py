@@ -1,19 +1,12 @@
-import logging
 import pandas as pd
 from dotenv import load_dotenv
+from loguru import logger
 from config import BANK_FILE, LEDGER_FILE, BANK_COLS, LEDGER_COLS
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, ".")
-
-try:
-    from loguru import logger
-except ImportError:
-    logger = logging.getLogger(__name__)
-    logging.basicConfig(level=logging.INFO,
-                        format="%(levelname)s: %(message)s")
 
 
 def _safe_numeric(series: pd.Series) -> pd.Series:
@@ -82,17 +75,3 @@ def load_ledger() -> pd.DataFrame:
 
     logger.info(f"load_ledger: {len(df)} rows loaded")
     return df[["row_id", "date", "description", "debit", "credit", "amount"]]
-
-
-# test loader
-if __name__ == "__main__":
-    load_dotenv()
-    logger.add("app.log", rotation="1 week")
-
-    bank = load_bank()
-    ledger = load_ledger()
-
-    logger.info(f"\n=== Bank ===\n{bank.to_string()}")
-    logger.info(f"\n=== Ledger ===\n{ledger.to_string()}")
-    logger.info(f"Bank shape   : {bank.shape}")
-    logger.info(f"Ledger shape : {ledger.shape}")

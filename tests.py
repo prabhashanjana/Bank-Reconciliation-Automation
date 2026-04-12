@@ -44,13 +44,64 @@ def test_validator(bank, ledger):
     return bank_v, ledger_v
 
 
+def test_categoriser(bank_v, ledger_v):
+    logger.info("=" * 50)
+    logger.info("TEST: categoriser.py")
+    logger.info("=" * 50)
+
+    from src.categoriser import prepare_and_categorise
+
+    bank_c = prepare_and_categorise(bank_v,   "bank")
+    ledger_c = prepare_and_categorise(ledger_v, "ledger")
+
+    cols = ["row_id", "description", "amount", "category"]
+    logger.info(f"\n=== Bank categories ===\n{bank_c[cols].to_string()}")
+    logger.info(f"\n=== Ledger categories ===\n{ledger_c[cols].to_string()}")
+
+    # all rows must have a source tag
+    assert bank_c["source"].eq("bank").all(),     "Bank source tag wrong"
+    assert ledger_c["source"].eq("ledger").all(), "Ledger source tag wrong"
+
+    # matched must start False
+    assert not bank_c["matched"].any(),   "Bank matched must start False"
+    assert not ledger_c["matched"].any(), "Ledger matched must start False"
+
+    # no row should be uncategorised in our sample data
+    bank_other = bank_c["category"].eq("other").sum()
+    ledger_other = ledger_c["category"].eq("other").sum()
+    if bank_other > 0:
+        logger.warning(
+            f"Bank has {bank_other} uncategorised rows — add rules to config.py")
+    if ledger_other > 0:
+        logger.warning(
+            f"Ledger has {ledger_other} uncategorised rows — add rules to config.py")
+
+    # shared categories check
+    bank_cats = set(bank_c["category"].unique())
+    ledger_cats = set(ledger_c["category"].unique())
+    shared = bank_cats & ledger_cats
+    logger.info(f"Shared categories : {sorted(shared)}")
+    logger.info(f"Bank only         : {sorted(bank_cats - ledger_cats)}")
+    logger.info(f"Ledger only       : {sorted(ledger_cats - bank_cats)}")
+
+    logger.info("test_categoriser: PASSED ✓")
+    return bank_c, ledger_c
+
+
 if __name__ == "__main__":
     logger.add("app.log", rotation="1 week")
     logger.info("Starting test suite")
 
-    bank, ledger = test_loader()
-    bank_v, ledger_v = test_validator(bank, ledger)
+    try:
+        bank, ledger = test_loader()
+        bank_v, ledger_v = test_validator(bank, ledger)
+        bank_c, ledger_c = test_categoriser(bank_v, ledger_v)
 
-    logger.info("=" * 50)
-    logger.info("ALL TESTS PASSED")
-    logger.info("=" * 50)
+        logger.info("=" * 50)
+        logger.info("ALL TESTS PASSED ✓")
+        logger.info("=" * 50)
+
+    except AssertionError as e:
+        logger.error(f"TEST FAILED: {e}")
+    except Exception as e:
+        logger.error(f"UNEXPECTED ERROR: {e}")

@@ -78,4 +78,5 @@ CATEGORY_RULES: list[tuple[str, str]] = [
     ("BANDARA",        "supplier_payment"),
     ("CHQ",            "cheque"),
     ("CHEQUE",         "cheque"),
+    ("PERERA", "staff_advance"),
 ]

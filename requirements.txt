@@ -1,0 +1,12 @@
+pandas
+pandera
+loguru
+python-dotenv
+playwright
+gspread
+google-auth
+openpyxl
+pdfplumber
+pikepdf
+jinja2
+tenacity

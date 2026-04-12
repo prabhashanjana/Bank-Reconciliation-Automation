@@ -1,8 +1,11 @@
 import pandas as pd
-import pandera as pa
-from pandera import Column, DataFrameSchema, Check
+import pandera.pandas as pa
+from pandera.pandas import Column, DataFrameSchema, Check
 from dotenv import load_dotenv
 from loguru import logger
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 load_dotenv()
 logger.add("app.log", rotation="1 week")
@@ -115,19 +118,3 @@ def validate_ledger(df: pd.DataFrame) -> pd.DataFrame:
     except Exception as e:
         logger.warning(f"validate_ledger unexpected error: {e}")
         return df
-
-
-# testing...
-if __name__ == "__main__":
-    import sys
-    sys.path.insert(0, ".")
-    from src.loader import load_bank, load_ledger
-
-    bank = load_bank()
-    ledger = load_ledger()
-
-    bank_v = validate_bank(bank)
-    ledger_v = validate_ledger(ledger)
-
-    logger.info(f"Bank shape   : {bank_v.shape}")
-    logger.info(f"Ledger shape : {ledger_v.shape}")

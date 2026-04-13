@@ -80,3 +80,6 @@ CATEGORY_RULES: list[tuple[str, str]] = [
     ("CHEQUE",         "cheque"),
     ("PERERA", "staff_advance"),
 ]
+
+DATE_TOLERANCE_EXACT = pd.Timedelta(days=0)   # Pass 1
+DATE_TOLERANCE_FUZZY = pd.Timedelta(days=5)   # Pass 2, 3, 4, 5

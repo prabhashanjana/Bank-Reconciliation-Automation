@@ -88,6 +88,33 @@ def test_categoriser(bank_v, ledger_v):
     return bank_c, ledger_c
 
 
+def test_matcher(bank_c, ledger_c):
+    logger.info("=" * 50)
+    logger.info("TEST: matcher.py — all passes")
+    logger.info("=" * 50)
+
+    from src.matcher import run_matcher
+
+    matched_df, exceptions_df, summary = run_matcher(bank_c, ledger_c)
+
+    logger.info(f"\n=== Matched ===\n{matched_df.to_string()}")
+    logger.info(f"\n=== Exceptions ===\n{exceptions_df.to_string()}")
+    logger.info(f"\n=== Summary ===")
+    for k, v in summary.items():
+        logger.info(f"  {k:20} : {v}")
+
+    # summary checks
+    assert summary["total_bank"] == 17, "Expected 17 bank rows"
+    assert summary["total_ledger"] == 15, "Expected 15 ledger rows"
+    assert summary["matched"] >= 14, "Expected at least 14 matched"
+    assert summary["bank_only"] == 1,  "Expected 1 BANK_ONLY"
+    assert summary["book_only"] == 1,  "Expected 1 BOOK_ONLY"
+    assert summary["exceptions"] == 2,  "Expected 2 exceptions"
+
+    logger.info("test_matcher: PASSED ✓")
+    return matched_df, exceptions_df, summary
+
+
 if __name__ == "__main__":
     logger.add("app.log", rotation="1 week")
     logger.info("Starting test suite")
@@ -96,6 +123,7 @@ if __name__ == "__main__":
         bank, ledger = test_loader()
         bank_v, ledger_v = test_validator(bank, ledger)
         bank_c, ledger_c = test_categoriser(bank_v, ledger_v)
+        matched_df, exceptions_df, summary = test_matcher(bank_c, ledger_c)
 
         logger.info("=" * 50)
         logger.info("ALL TESTS PASSED ✓")

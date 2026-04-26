@@ -72,6 +72,7 @@ def write_exceptions(gc, exceptions_df):
         ws.clear()
 
         df = exceptions_df.copy()
+        df = df.fillna("") 
         # convert dates to string
         df["date"] = df['date'].dt.strftime('%Y-%m-%d')
 

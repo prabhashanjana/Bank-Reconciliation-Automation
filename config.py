@@ -5,6 +5,10 @@ import pandas as pd
 from dotenv import load_dotenv
 from loguru import logger
 
+import sys
+sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent / "src"))
+
 load_dotenv()
 logger.add("app.log", rotation="1 week")
 
@@ -14,9 +18,9 @@ OUTPUT_DIR = Path("output/")
 
 
 SHEET_ID = os.getenv("SHEET_ID")
-EMAIL_SENDER = os.getenv("EMAIL_SENDER")
+EMAIL_SENDER = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
-EMAIL_RECIPIENT = os.getenv("EMAIL_RECIPIENT")
+EMAIL_RECIPIENT = os.getenv("TO_EMAIL")
 
 _REQUIRED = {
     "SHEET_ID": SHEET_ID,
